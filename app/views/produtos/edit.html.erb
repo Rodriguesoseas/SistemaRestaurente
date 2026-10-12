@@ -1,0 +1,10 @@
+<% content_for :title, "Editar produto" %>
+<div class="mb-8">
+  <p class="mb-2 text-xs font-semibold uppercase tracking-widest text-emerald-700">Cardápio e estoque</p>
+  <h1 class="text-3xl font-bold tracking-tight text-forest">Editar produto</h1>
+  <p class="mt-2 text-sm leading-6 text-stone-500">Mudanças de preço valem para novos pedidos; pedidos antigos guardam o preço da época.</p>
+</div>
+
+<section class="max-w-xl rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
+  <%= render "form", produto: @produto %>
+</section>

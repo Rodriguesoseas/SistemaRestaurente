@@ -1,0 +1,14 @@
+#!/usr/bin/env ruby
+require "fileutils"
+require "rbconfig"
+
+APP_ROOT = File.expand_path("..", __dir__)
+
+FileUtils.chdir APP_ROOT do
+  system("bundle check") || system("bundle install", exception: true)
+  system(RbConfig.ruby, "bin/rails", "db:create", "db:migrate", "db:seed", "tailwindcss:build", exception: true)
+  system(RbConfig.ruby, "bin/rails", "db:migrate", "RAILS_ENV=test", exception: true)
+  unless ARGV.include?("--skip-server")
+    exec RbConfig.ruby, "bin/rails", "server", "-b", "127.0.0.1"
+  end
+end

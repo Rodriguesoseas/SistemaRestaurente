@@ -1,0 +1,40 @@
+<% content_for :title, "Fechar caixa" %>
+<div class="mb-8">
+  <p class="mb-2 text-xs font-semibold uppercase tracking-widest text-emerald-700">Operação</p>
+  <h1 class="text-3xl font-bold tracking-tight text-forest">Fechar caixa</h1>
+  <p class="mt-2 text-sm leading-6 text-stone-500">Confira o resumo e informe o valor contado em dinheiro.</p>
+</div>
+
+<section class="max-w-2xl space-y-6">
+  <div class="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+    <h2 class="text-lg font-semibold text-forest">Resumo</h2>
+    <dl class="mt-4 space-y-3 text-sm">
+      <div class="flex justify-between gap-4"><dt class="text-stone-500">Saldo inicial</dt><dd class="font-medium"><%= number_to_currency(@caixa.saldo_inicial) %></dd></div>
+      <div class="flex justify-between gap-4"><dt class="text-stone-500">Entradas</dt><dd class="font-medium"><%= number_to_currency(@caixa.entradas) %></dd></div>
+      <div class="flex justify-between gap-4"><dt class="text-stone-500">Saídas</dt><dd class="font-medium"><%= number_to_currency(@caixa.saidas) %></dd></div>
+      <div class="flex justify-between gap-4 border-t border-stone-200 pt-3"><dt class="font-semibold text-stone-700">Resultado</dt><dd class="font-semibold"><%= number_to_currency(@caixa.resultado) %></dd></div>
+      <div class="flex justify-between gap-4"><dt class="font-semibold text-stone-700">Dinheiro esperado</dt><dd class="font-semibold"><%= number_to_currency(@caixa.dinheiro_esperado) %></dd></div>
+    </dl>
+  </div>
+
+  <%= form_with url: confirmar_fechamento_caixa_path(@caixa), method: :patch, class: "rounded-2xl border border-stone-200 bg-white p-6 shadow-sm space-y-5" do |f| %>
+    <% if @caixa.errors.any? %>
+      <div role="alert" class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900">
+        <ul class="list-inside list-disc">
+          <% @caixa.errors.full_messages.each do |message| %><li><%= message %></li><% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div>
+      <%= f.label :valor_contado, "Valor contado em dinheiro (R$)", class: "form-label" %>
+      <%= f.number_field :valor_contado, name: "caixa[valor_contado]", step: "0.01", min: 0, required: true, inputmode: "decimal", value: number_with_precision(@caixa.valor_contado, precision: 2), class: "form-input" %>
+      <p class="mt-2 text-xs text-stone-500">Pix e cartão não entram na contagem física.</p>
+    </div>
+
+    <div class="flex flex-wrap gap-3">
+      <%= f.submit "CONFIRMAR FECHAMENTO", class: "primary-button", data: { turbo_confirm: "Confirma o fechamento deste caixa?" } %>
+      <%= link_to "Cancelar", caixas_path, class: "inline-flex min-h-12 items-center rounded-xl border border-stone-300 px-5 py-3 text-sm font-semibold text-stone-700 hover:bg-stone-50" %>
+    </div>
+  <% end %>
+</section>

@@ -1,0 +1,34 @@
+<% content_for :title, "Abrir caixa" %>
+<div class="mb-8">
+  <p class="mb-2 text-xs font-semibold uppercase tracking-widest text-emerald-700">Operação</p>
+  <h1 class="text-3xl font-bold tracking-tight text-forest">Abrir caixa</h1>
+  <p class="mt-2 text-sm leading-6 text-stone-500">Informe o saldo inicial. Data, hora e responsável são registrados automaticamente.</p>
+</div>
+
+<section class="max-w-xl rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
+  <%= form_with model: @caixa, url: caixas_path, class: "space-y-5" do |f| %>
+    <% if @caixa.errors.any? %>
+      <div role="alert" class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900">
+        <p class="font-medium">Não foi possível abrir o caixa:</p>
+        <ul class="mt-1 list-inside list-disc">
+          <% @caixa.errors.full_messages.each do |message| %><li><%= message %></li><% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div>
+      <%= f.label :saldo_inicial, "Saldo inicial (R$)", class: "form-label" %>
+      <%= f.number_field :saldo_inicial, step: "0.01", min: 0, value: number_with_precision(@caixa.saldo_inicial || 0, precision: 2), required: true, inputmode: "decimal", class: "form-input" %>
+    </div>
+
+    <div class="rounded-xl bg-stone-50 p-4 text-sm text-stone-600">
+      <p><strong class="text-stone-900">Responsável:</strong> <%= current_user.email %></p>
+      <p class="mt-1"><strong class="text-stone-900">Data/hora:</strong> <%= l(Time.current) %></p>
+    </div>
+
+    <div class="flex flex-wrap gap-3">
+      <%= f.submit "ABRIR CAIXA", class: "primary-button" %>
+      <%= link_to "Cancelar", caixas_path, class: "inline-flex min-h-12 items-center rounded-xl border border-stone-300 px-5 py-3 text-sm font-semibold text-stone-700 hover:bg-stone-50" %>
+    </div>
+  <% end %>
+</section>

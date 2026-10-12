@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <title><%= content_for?(:title) ? "#{yield(:title)} | Espetaria" : "Espetaria" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="theme-color" content="#172b25">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= favicon_link_tag "/icon.svg", type: "image/svg+xml" %>
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+  <body class="min-h-screen bg-stone-50 text-stone-800 antialiased">
+    <a href="#conteudo" class="skip-link">Ir para o conteúdo</a>
+    <% if user_signed_in? %>
+      <div class="min-h-screen lg:grid lg:grid-cols-[17rem_1fr]" data-controller="menu" data-action="keydown.esc@window->menu#close turbo:before-cache@document->menu#close">
+        <aside class="bg-forest text-white lg:min-h-screen">
+          <div class="flex min-h-20 items-center justify-between gap-4 px-6 py-5 lg:px-7 lg:py-8">
+            <%= link_to dashboard_path, class: "flex items-center gap-3 rounded-lg font-bold tracking-tight text-xl", aria: { label: "Espetaria — Dashboard" } do %>
+              <span class="flex size-10 items-center justify-center rounded-xl bg-amber-400 text-forest" aria-hidden="true"><%= icon("flame") %></span>
+              Espetaria<span class="sr-only"> — Dashboard</span>
+            <% end %>
+            <button type="button" class="flex min-h-11 min-w-11 items-center justify-center rounded-lg border border-white/25 lg:hidden" aria-label="Abrir menu" aria-controls="menu-principal" aria-expanded="false" data-menu-target="button" data-action="menu#toggle">
+              <%= icon("menu") %>
+            </button>
+          </div>
+          <div id="menu-principal" class="hidden border-t border-white/10 px-4 pb-6 pt-4 lg:block lg:border-0 lg:pt-0" data-menu-target="panel">
+            <%= render "shared/navigation" %>
+            <div class="mt-8 border-t border-white/15 px-3 pt-5">
+              <p class="text-xs font-medium uppercase tracking-widest text-white/60">Conectado como</p>
+              <p class="mt-2 break-all text-sm text-white/90"><%= current_user.email %></p>
+              <%= button_to destroy_user_session_path, method: :delete, class: "mt-4 flex min-h-11 w-full items-center gap-3 rounded-lg px-3 text-left text-sm font-semibold text-white/80 hover:bg-white/10 hover:text-white" do %>
+                <%= icon("logout") %> Sair
+              <% end %>
+            </div>
+          </div>
+        </aside>
+        <div class="min-w-0">
+          <header class="flex flex-wrap items-center justify-between gap-3 border-b border-stone-200 bg-white px-5 py-5 sm:px-8 lg:px-10">
+            <p class="text-sm font-medium text-stone-600">Gestão do seu estabelecimento</p>
+            <p class="text-sm text-stone-500"><time datetime="<%= Date.current.iso8601 %>"><%= l(Date.current) %></time> · Teresina</p>
+          </header>
+          <main id="conteudo" tabindex="-1" class="mx-auto max-w-7xl px-5 py-7 sm:px-8 lg:px-10 lg:py-10">
+            <%= render "shared/flash" %>
+            <%= yield %>
+          </main>
+        </div>
+      </div>
+    <% else %>
+      <main id="conteudo" tabindex="-1" class="flex min-h-screen items-center justify-center px-5 py-10">
+        <div class="w-full max-w-md">
+          <%= render "shared/flash" %>
+          <%= yield %>
+        </div>
+      </main>
+    <% end %>
+  </body>
+</html>

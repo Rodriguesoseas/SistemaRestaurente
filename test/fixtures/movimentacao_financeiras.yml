@@ -1,0 +1,19 @@
+venda_dinheiro:
+  caixa: fechado
+  user: admin
+  categoria_financeira: venda
+  tipo: entrada
+  descricao: Venda do balcão
+  valor: 50.00
+  forma_pagamento: dinheiro
+  ocorrido_em: 2026-10-01 10:00:00
+
+compra_carvao:
+  caixa: fechado
+  user: admin
+  categoria_financeira: carvao
+  tipo: saida
+  descricao: Compra de carvão
+  valor: 30.00
+  forma_pagamento: nao_informada
+  ocorrido_em: 2026-10-01 11:00:00

@@ -1,0 +1,114 @@
+<% content_for :title, "Comanda da Mesa #{@comanda.mesa.numero}" %>
+<div class="mb-8 flex flex-wrap items-start justify-between gap-4">
+  <div>
+    <p class="mb-2 text-xs font-semibold uppercase tracking-widest text-emerald-700">Salão · Mesa <%= @comanda.mesa.numero %></p>
+    <h1 class="text-3xl font-bold tracking-tight text-forest">Comanda</h1>
+    <p class="mt-2 text-sm leading-6 text-stone-500">Aberta em <%= l(@comanda.aberta_em) %> por <%= @comanda.abertura_user.email %>.</p>
+  </div>
+  <% if @comanda.aberta? %>
+    <span class="inline-flex rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-900">ABERTA</span>
+  <% else %>
+    <span class="inline-flex rounded-full bg-stone-100 px-3 py-1 text-xs font-bold text-stone-600">FECHADA</span>
+  <% end %>
+</div>
+
+<section class="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm sm:p-6" aria-label="Total da comanda">
+  <div class="flex flex-wrap items-end justify-between gap-4">
+    <div>
+      <p class="text-xs font-medium uppercase tracking-wider text-stone-500">Total</p>
+      <p class="mt-1 text-3xl font-bold text-forest"><%= number_to_currency(@comanda.valor_total) %></p>
+    </div>
+    <% if @comanda.aberta? %>
+      <%= link_to "PAGAR", pagar_comanda_path(@comanda), class: "inline-flex min-h-12 items-center rounded-xl bg-forest px-6 py-3 text-sm font-bold text-white hover:bg-emerald-900" %>
+    <% else %>
+      <p class="text-sm text-stone-600">Paga via <%= @comanda.movimentacao_financeira&.forma_pagamento_rotulo || "—" %> em <%= @comanda.fechada_em ? l(@comanda.fechada_em) : "—" %> por <%= @comanda.pagamento_user&.email || "—" %>.</p>
+    <% end %>
+  </div>
+</section>
+
+<section class="mt-8" aria-label="Pedidos">
+  <h2 class="mb-4 text-lg font-semibold text-forest">Pedidos</h2>
+  <% if @itens.any? %>
+    <div class="space-y-3">
+      <% @itens.each do |item| %>
+        <article class="rounded-2xl border border-stone-200 bg-white p-4 shadow-sm">
+          <div class="flex flex-wrap items-start justify-between gap-3">
+            <div class="min-w-0">
+              <h3 class="font-semibold text-stone-800"><%= item.descricao %></h3>
+              <p class="mt-1 text-xs text-stone-500"><%= number_to_currency(item.valor_unitario) %> cada<%= " · #{item.observacao}" if item.observacao.present? %></p>
+              <% unless item.produto.vendavel? %>
+                <p class="mt-1 text-xs font-medium text-amber-800">Produto fora de venda — mantido no histórico.</p>
+              <% end %>
+            </div>
+            <p class="text-lg font-bold text-stone-800"><%= number_to_currency(item.subtotal) %></p>
+          </div>
+          <% if @comanda.aberta? %>
+            <div class="mt-3 flex flex-wrap items-center gap-2 border-t border-stone-100 pt-3">
+              <%= form_with url: comanda_item_path(@comanda, item), method: :patch, class: "flex items-center gap-2" do |f| %>
+                <%= f.label :quantidade, "Qtd", class: "text-xs font-medium text-stone-500" %>
+                <%= f.number_field :quantidade, name: "item_comanda[quantidade]", value: number_with_precision(item.quantidade, precision: 3, strip_insignificant_zeros: true), step: "any", min: 0.001, required: true, inputmode: "decimal", class: "w-24 rounded-lg border border-stone-300 px-3 py-2 text-sm" %>
+                <%= f.submit "Atualizar", class: "inline-flex min-h-11 items-center rounded-lg border border-stone-300 px-3 py-2 text-xs font-bold text-stone-700 hover:bg-stone-50" %>
+              <% end %>
+              <%= button_to "Remover", comanda_item_path(@comanda, item), method: :delete, class: "inline-flex min-h-11 items-center rounded-lg border border-red-200 px-3 py-2 text-xs font-bold text-red-700 hover:bg-red-50", form: { data: { turbo_confirm: "Remover este pedido?" } } %>
+            </div>
+          <% else %>
+            <p class="mt-2 text-xs text-stone-500">Quantidade: <%= number_with_precision(item.quantidade, precision: 3, strip_insignificant_zeros: true) %></p>
+          <% end %>
+        </article>
+      <% end %>
+    </div>
+  <% else %>
+    <p class="rounded-2xl border border-dashed border-stone-300 bg-white px-6 py-10 text-center text-sm text-stone-500">Nenhum pedido ainda.</p>
+  <% end %>
+</section>
+
+<% if @comanda.aberta? %>
+  <section class="mt-8 max-w-xl rounded-2xl border border-stone-200 bg-white p-6 shadow-sm" aria-label="Adicionar pedido">
+    <h2 class="text-lg font-semibold text-forest">Adicionar pedido</h2>
+    <%= form_with model: [ @comanda, @item ], url: comanda_itens_path(@comanda), class: "mt-4 space-y-4", data: { controller: "item" } do |f| %>
+      <% if @item.errors.any? %>
+        <div role="alert" class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900">
+          <ul class="list-inside list-disc">
+            <% @item.errors.full_messages.each do |message| %><li><%= message %></li><% end %>
+          </ul>
+        </div>
+      <% end %>
+      <% if @preco_mudou_para %>
+        <div role="alert" class="rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+          <p class="font-medium">O preço mudou para <%= number_to_currency(@preco_mudou_para) %> desde a seleção.</p>
+          <p class="mt-1">Confirme para lançar com o preço atual.</p>
+        </div>
+      <% end %>
+
+      <div>
+        <%= f.label :produto_id, "Produto", class: "form-label" %>
+        <%= f.select :produto_id,
+              options_for_select(@produtos.map { |p| [ "#{p.nome} — #{number_to_currency(p.preco_venda)}", p.id, { "data-preco" => number_with_precision(p.preco_venda, precision: 2, separator: ",", delimiter: ".") } ] }, @item.produto_id),
+              { prompt: "Selecione o produto" },
+              class: "form-input", data: { item_target: "produto", action: "item#atualizar" } %>
+        <p class="mt-2 text-xs font-medium text-stone-600" data-item-target="preco">—</p>
+        <%= f.hidden_field :preco_exibido, value: @item.produto&.preco_venda, data: { item_target: "precoExibido" } %>
+        <%= f.hidden_field :confirmar_preco, value: "", data: { item_target: "confirmarPreco" } %>
+      </div>
+
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div>
+          <%= f.label :quantidade, "Quantidade", class: "form-label" %>
+          <%= f.number_field :quantidade, step: "any", min: 0.001, required: true, inputmode: "decimal", class: "form-input" %>
+        </div>
+        <div>
+          <%= f.label :observacao, "Observação (opcional)", class: "form-label" %>
+          <%= f.text_field :observacao, maxlength: 255, placeholder: "Ex.: sem gelo", class: "form-input" %>
+        </div>
+      </div>
+
+      <%= f.submit "ADICIONAR", class: "primary-button" %>
+    <% end %>
+    <p class="mt-3 text-xs text-stone-500">O estoque não é baixado pelos pedidos; a baixa manual chega na próxima fase.</p>
+  </section>
+<% end %>
+
+<div class="mt-8 flex flex-wrap gap-3">
+  <%= link_to "Voltar às mesas", mesas_path, class: "inline-flex min-h-12 items-center rounded-xl border border-stone-300 px-5 py-3 text-sm font-semibold text-stone-700 hover:bg-stone-50" %>
+  <%= link_to "Histórico de comandas", comandas_path, class: "inline-flex min-h-12 items-center rounded-xl border border-stone-300 px-5 py-3 text-sm font-semibold text-stone-700 hover:bg-stone-50" %>
+</div>

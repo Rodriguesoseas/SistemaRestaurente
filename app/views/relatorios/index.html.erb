@@ -1,0 +1,120 @@
+<% content_for :title, "Relatórios" %>
+<div class="mb-8">
+  <p class="mb-2 text-xs font-semibold uppercase tracking-widest text-emerald-700">Análise</p>
+  <h1 class="text-3xl font-bold tracking-tight text-forest">Relatórios</h1>
+  <p class="mt-2 text-sm leading-6 text-stone-500">Entradas, saídas, resultado e exportações no período.</p>
+</div>
+
+<section class="mb-6 rounded-2xl border border-stone-200 bg-white p-5 shadow-sm sm:p-6" aria-label="Filtro de período">
+  <div class="flex flex-wrap gap-2">
+    <% FiltroPeriodo::PERIODOS.each do |periodo| %>
+      <%= link_to FiltroPeriodo::ROTULOS_PERIODO.fetch(periodo).upcase, relatorios_path(periodo: periodo), class: "inline-flex min-h-11 items-center rounded-xl px-4 py-2 text-xs font-bold #{@filtro.periodo == periodo ? 'bg-forest text-white' : 'border border-stone-300 text-stone-700 hover:bg-stone-50'}", aria: { current: @filtro.periodo == periodo ? "true" : nil } %>
+    <% end %>
+  </div>
+
+  <div class="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-stone-100 pt-4">
+    <p class="text-sm font-semibold text-forest"><%= @filtro.descricao %></p>
+    <div class="flex gap-2">
+      <%= link_to "← ANTERIOR", relatorios_path(@filtro.anterior_parametros), class: "inline-flex min-h-11 items-center rounded-xl border border-stone-300 px-4 py-2 text-xs font-bold text-stone-700 hover:bg-stone-50" %>
+      <% unless @filtro.atual? %>
+        <%= link_to "PRÓXIMO →", relatorios_path(@filtro.proximo_parametros), class: "inline-flex min-h-11 items-center rounded-xl border border-stone-300 px-4 py-2 text-xs font-bold text-stone-700 hover:bg-stone-50" %>
+      <% end %>
+    </div>
+  </div>
+
+  <%= form_with url: relatorios_path, method: :get, class: "mt-4 grid grid-cols-1 gap-4 border-t border-stone-100 pt-4 sm:grid-cols-3" do |f| %>
+    <%= f.hidden_field :periodo, value: FiltroPeriodo::PERSONALIZADO %>
+    <div>
+      <%= f.label :de, "De", class: "form-label" %>
+      <%= f.date_field :de, value: @filtro.de&.iso8601, class: "form-input" %>
+    </div>
+    <div>
+      <%= f.label :ate, "Até", class: "form-label" %>
+      <%= f.date_field :ate, value: @filtro.ate&.iso8601, class: "form-input" %>
+    </div>
+    <div class="flex items-end">
+      <%= f.submit "FILTRAR", class: "primary-button" %>
+    </div>
+  <% end %>
+</section>
+
+<section aria-label="Resumo" class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
+  <article class="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
+    <h2 class="text-sm font-medium text-stone-600">Entradas</h2>
+    <p class="mt-2 text-2xl font-semibold text-emerald-700"><%= number_to_currency(@relatorio.entradas) %></p>
+  </article>
+  <article class="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
+    <h2 class="text-sm font-medium text-stone-600">Saídas</h2>
+    <p class="mt-2 text-2xl font-semibold text-red-700"><%= number_to_currency(@relatorio.saidas) %></p>
+  </article>
+  <article class="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
+    <h2 class="text-sm font-medium text-stone-600">Resultado</h2>
+    <p class="mt-2 text-2xl font-semibold text-stone-800"><%= number_to_currency(@relatorio.resultado) %></p>
+  </article>
+  <article class="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
+    <h2 class="text-sm font-medium text-stone-600">Caixas abertos</h2>
+    <p class="mt-2 text-2xl font-semibold text-stone-800"><%= @relatorio.caixas_abertos %></p>
+  </article>
+  <article class="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
+    <h2 class="text-sm font-medium text-stone-600">Média diária</h2>
+    <p class="mt-2 text-2xl font-semibold text-stone-800"><%= number_to_currency(@relatorio.media_diaria) %></p>
+    <p class="mt-1 text-xs text-stone-500">Resultado ÷ <%= @relatorio.dias_corridos %> dias corridos</p>
+  </article>
+</section>
+
+<section class="mt-7 rounded-2xl border border-stone-200 bg-white p-5 shadow-sm sm:p-6" aria-label="Gráfico de entradas e saídas">
+  <h2 class="text-lg font-semibold text-forest">Entradas e saídas</h2>
+  <div class="mt-4 h-72" data-controller="chart" data-chart-tipo-value="Column" data-chart-dados-value='<%= [ { name: "Entradas", data: @relatorio.serie_entradas }, { name: "Saídas", data: @relatorio.serie_saidas } ].to_json %>' data-chart-opcoes-value='<%= { prefix: "R$ ", thousands: ".", decimal: "," }.to_json %>'></div>
+</section>
+
+<section class="mt-7 rounded-2xl border border-stone-200 bg-white p-5 shadow-sm sm:p-6" aria-label="Gráfico de resultado">
+  <h2 class="text-lg font-semibold text-forest">Resultado</h2>
+  <div class="mt-4 h-72" data-controller="chart" data-chart-tipo-value="Line" data-chart-dados-value='<%= [ { name: "Resultado", data: @relatorio.serie_resultado } ].to_json %>' data-chart-opcoes-value='<%= { prefix: "R$ ", thousands: ".", decimal: "," }.to_json %>'></div>
+</section>
+
+<div class="mt-7 grid grid-cols-1 gap-4 lg:grid-cols-2">
+  <section class="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm sm:p-6" aria-label="Totais por pagamento">
+    <h2 class="text-lg font-semibold text-forest">Entradas por pagamento</h2>
+    <% totais = @relatorio.totais_por_pagamento %>
+    <% if totais.any? %>
+      <dl class="mt-4 space-y-3 text-sm">
+        <% MovimentacaoFinanceira::FORMAS_EXPLICITAS.each do |forma| %>
+          <div class="flex justify-between gap-4">
+            <dt class="text-stone-500"><%= MovimentacaoFinanceira::ROTULOS_FORMA_PAGAMENTO.fetch(forma) %></dt>
+            <dd class="font-medium"><%= number_to_currency(totais.fetch(forma, 0)) %></dd>
+          </div>
+        <% end %>
+      </dl>
+    <% else %>
+      <p class="mt-4 text-sm text-stone-500">Nenhuma entrada neste período.</p>
+    <% end %>
+  </section>
+
+  <section class="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm sm:p-6" aria-label="Despesas por categoria">
+    <h2 class="text-lg font-semibold text-forest">Despesas por categoria</h2>
+    <% despesas = @relatorio.despesas_por_categoria %>
+    <% if despesas.any? %>
+      <dl class="mt-4 space-y-3 text-sm">
+        <% despesas.sort_by { |_, total| -total }.each do |categoria, total| %>
+          <div class="flex justify-between gap-4">
+            <dt class="text-stone-500"><%= categoria %></dt>
+            <dd class="font-medium"><%= number_to_currency(total) %></dd>
+          </div>
+        <% end %>
+      </dl>
+    <% else %>
+      <p class="mt-4 text-sm text-stone-500">Nenhuma saída neste período.</p>
+    <% end %>
+  </section>
+</div>
+
+<section class="mt-7 rounded-2xl border border-stone-200 bg-white p-5 shadow-sm sm:p-6" aria-label="Exportar CSV">
+  <h2 class="text-lg font-semibold text-forest">Exportar CSV</h2>
+  <p class="mt-2 text-sm text-stone-500">As exportações financeiras respeitam o período selecionado (<%= @filtro.descricao %>).</p>
+  <div class="mt-4 flex flex-wrap gap-3">
+    <%= link_to "MOVIMENTAÇÕES CSV", movimentacoes_relatorios_path(format: :csv, **@filtro.parametros_url), class: "inline-flex min-h-12 items-center rounded-xl border border-stone-300 px-5 py-3 text-sm font-semibold text-stone-700 hover:bg-stone-50" %>
+    <%= link_to "CAIXAS CSV", caixas_relatorios_path(format: :csv, **@filtro.parametros_url), class: "inline-flex min-h-12 items-center rounded-xl border border-stone-300 px-5 py-3 text-sm font-semibold text-stone-700 hover:bg-stone-50" %>
+    <%= link_to "PRODUTOS CSV", produtos_relatorios_path(format: :csv), class: "inline-flex min-h-12 items-center rounded-xl border border-stone-300 px-5 py-3 text-sm font-semibold text-stone-700 hover:bg-stone-50" %>
+    <%= link_to "COMANDAS CSV", comandas_relatorios_path(format: :csv, **@filtro.parametros_url), class: "inline-flex min-h-12 items-center rounded-xl border border-stone-300 px-5 py-3 text-sm font-semibold text-stone-700 hover:bg-stone-50" %>
+  </div>
+</section>

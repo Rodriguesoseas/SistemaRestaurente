@@ -1,0 +1,7 @@
+item_espeto:
+  comanda: fechada_mesa2
+  produto: espeto
+  descricao: Espeto de carne
+  quantidade: 2
+  valor_unitario: 10.00
+  subtotal: 20.00

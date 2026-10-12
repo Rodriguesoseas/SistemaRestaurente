@@ -1,0 +1,87 @@
+pt-BR:
+  date:
+    formats:
+      default: "%d/%m/%Y"
+  time:
+    formats:
+      default: "%d/%m/%Y %H:%M"
+      short: "%H:%M"
+  number:
+    currency:
+      format:
+        unit: "R$"
+        separator: ","
+        delimiter: "."
+        precision: 2
+        format: "%u %n"
+  activerecord:
+    models:
+      user: Usuário
+      caixa: Caixa
+      categoria_financeira: Categoria financeira
+      movimentacao_financeira: Movimentação financeira
+      categoria_produto: Categoria de produto
+      produto: Produto
+      mesa: Mesa
+      comanda: Comanda
+      item_comanda: Item da comanda
+      movimentacao_estoque: Movimentação de estoque
+    attributes:
+      user:
+        email: E-mail
+        password: Senha
+        password_confirmation: Confirmação de senha
+      caixa:
+        saldo_inicial: Saldo inicial
+        valor_contado: Valor contado
+      categoria_financeira:
+        nome: Nome
+        tipo: Tipo
+      movimentacao_financeira:
+        tipo: Tipo
+        categoria_financeira: Categoria
+        descricao: Descrição
+        valor: Valor
+        forma_pagamento: Pagamento
+        ocorrido_em: Data e hora
+        caixa: Caixa
+      categoria_produto:
+        nome: Nome
+      produto:
+        nome: Nome
+        categoria_produto: Categoria
+        unidade: Unidade
+        estoque_minimo: Estoque mínimo
+        preco_custo: Preço de custo
+        preco_venda: Preço de venda
+      mesa:
+        numero: Número
+        nome: Nome
+      comanda:
+        forma_pagamento: Pagamento
+      item_comanda:
+        produto: Produto
+        quantidade: Quantidade
+        observacao: Observação
+      movimentacao_estoque:
+        produto: Produto
+        tipo: Tipo
+        quantidade: Quantidade
+        motivo: Motivo
+        observacao: Observação
+        ocorrido_em: Data e hora
+  devise:
+    sessions:
+      signed_in: "Login realizado com sucesso."
+      signed_out: "Você saiu do sistema."
+      already_signed_out: "Você saiu do sistema."
+    failure:
+      already_authenticated: "Você já está conectado."
+      unauthenticated: "Entre com seu e-mail e senha para continuar."
+      invalid: "E-mail ou senha inválidos."
+      not_found_in_database: "E-mail ou senha inválidos."
+      timeout: "Sua sessão expirou. Entre novamente para continuar."
+      inactive: "Sua conta não está ativa."
+      locked: "Sua conta está bloqueada."
+      unconfirmed: "Sua conta ainda não foi confirmada."
+      last_attempt: "Você tem mais uma tentativa antes do bloqueio da conta."

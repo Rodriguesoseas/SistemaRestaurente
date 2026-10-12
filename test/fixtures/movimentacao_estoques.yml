@@ -1,0 +1,16 @@
+entrada_cerveja:
+  produto: cerveja
+  user: admin
+  tipo: entrada
+  quantidade: 12
+  motivo: compra
+  observacao: Nota fiscal 123
+  ocorrido_em: 2026-10-01 09:00:00
+
+saida_carvao:
+  produto: carvao_interno
+  user: admin
+  tipo: saida
+  quantidade: 1
+  motivo: consumo_interno
+  ocorrido_em: 2026-10-01 10:00:00

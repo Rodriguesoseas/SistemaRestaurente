@@ -1,0 +1,61 @@
+<% content_for :title, "Caixa" %>
+<div class="mb-8">
+  <p class="mb-2 text-xs font-semibold uppercase tracking-widest text-emerald-700">Operação</p>
+  <h1 class="text-3xl font-bold tracking-tight text-forest">Caixa</h1>
+  <p class="mt-2 text-sm leading-6 text-stone-500">Abertura, conferência e histórico dos caixas.</p>
+</div>
+
+<% if @caixa_atual %>
+  <%= render "caixa_atual", caixa: @caixa_atual %>
+<% else %>
+  <section class="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8" aria-labelledby="sem-caixa">
+    <span class="flex size-12 items-center justify-center rounded-xl bg-amber-50 text-amber-700" aria-hidden="true"><%= icon("cash") %></span>
+    <h2 id="sem-caixa" class="mt-4 text-lg font-semibold text-forest">Nenhum caixa aberto</h2>
+    <p class="mt-2 max-w-xl text-sm leading-6 text-stone-500">Abra o caixa para começar a registrar as movimentações do dia.</p>
+    <div class="mt-5"><%= link_to "ABRIR CAIXA", new_caixa_path, class: "primary-button inline-flex" %></div>
+  </section>
+<% end %>
+
+<section class="mt-8" aria-labelledby="historico">
+  <h2 id="historico" class="mb-4 text-lg font-semibold text-forest">Histórico de caixas</h2>
+  <% if @caixas.any? %>
+    <div class="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-stone-200 text-sm">
+          <thead class="bg-stone-50 text-left text-xs uppercase tracking-wider text-stone-500">
+            <tr>
+              <th class="px-4 py-3 font-medium">Data</th>
+              <th class="px-4 py-3 font-medium">Abertura</th>
+              <th class="px-4 py-3 font-medium">Fechamento</th>
+              <th class="px-4 py-3 font-medium">Responsável</th>
+              <th class="px-4 py-3 text-right font-medium">Entradas</th>
+              <th class="px-4 py-3 text-right font-medium">Saídas</th>
+              <th class="px-4 py-3 text-right font-medium">Resultado</th>
+              <th class="px-4 py-3 text-right font-medium">Diferença</th>
+              <th class="px-4 py-3 font-medium">Status</th>
+              <th class="px-4 py-3"></th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-stone-100">
+            <% @caixas.each do |caixa| %>
+              <tr>
+                <td class="whitespace-nowrap px-4 py-3"><%= l(caixa.aberto_em.to_date) %></td>
+                <td class="whitespace-nowrap px-4 py-3"><%= l(caixa.aberto_em, format: :short) %></td>
+                <td class="whitespace-nowrap px-4 py-3"><%= caixa.fechado_em ? l(caixa.fechado_em, format: :short) : "—" %></td>
+                <td class="px-4 py-3"><%= caixa.user.email %></td>
+                <td class="whitespace-nowrap px-4 py-3 text-right"><%= number_to_currency(caixa.entradas) %></td>
+                <td class="whitespace-nowrap px-4 py-3 text-right"><%= number_to_currency(caixa.saidas) %></td>
+                <td class="whitespace-nowrap px-4 py-3 text-right"><%= number_to_currency(caixa.resultado) %></td>
+                <td class="whitespace-nowrap px-4 py-3 text-right"><%= caixa.diferenca.nil? ? "—" : number_to_currency(caixa.diferenca) %></td>
+                <td class="px-4 py-3"><%= render "status", caixa: caixa %></td>
+                <td class="whitespace-nowrap px-4 py-3 text-right"><%= link_to "VER DETALHES", caixa_path(caixa), class: "table-link" %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  <% else %>
+    <p class="rounded-2xl border border-dashed border-stone-300 bg-white px-6 py-10 text-center text-sm text-stone-500">Nenhum caixa registrado até o momento.</p>
+  <% end %>
+</section>

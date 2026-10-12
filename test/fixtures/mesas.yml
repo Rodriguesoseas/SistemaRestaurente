@@ -1,0 +1,8 @@
+mesa_1:
+  numero: 1
+  ativo: true
+
+mesa_2:
+  numero: 2
+  nome: Varanda
+  ativo: true

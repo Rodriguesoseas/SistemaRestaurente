@@ -1,0 +1,70 @@
+<% content_for :title, "Nova movimentação" %>
+<div class="mb-8">
+  <p class="mb-2 text-xs font-semibold uppercase tracking-widest text-emerald-700">Financeiro</p>
+  <h1 class="text-3xl font-bold tracking-tight text-forest">Nova movimentação</h1>
+  <p class="mt-2 text-sm leading-6 text-stone-500">O lançamento entra no caixa atual. Responsável, caixa e data são registrados automaticamente.</p>
+</div>
+
+<section class="max-w-xl rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
+  <%= form_with model: @movimentacao, url: movimentacao_financeiras_path, class: "space-y-5", data: { controller: "movimentacao" } do |f| %>
+    <% if @movimentacao.errors.any? %>
+      <div role="alert" class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900">
+        <p class="font-medium">Não foi possível registrar a movimentação:</p>
+        <ul class="mt-1 list-inside list-disc">
+          <% @movimentacao.errors.full_messages.each do |message| %><li><%= message %></li><% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div>
+      <%= f.label :tipo, "Tipo", class: "form-label" %>
+      <%= f.select :tipo, options_for_select([ [ "Entrada", "entrada" ], [ "Saída", "saida" ] ], @movimentacao.tipo), {}, class: "form-input", data: { movimentacao_target: "tipo", action: "movimentacao#filtrar" } %>
+    </div>
+
+    <div>
+      <%= f.label :categoria_financeira_id, "Categoria", class: "form-label" %>
+      <%= f.select :categoria_financeira_id,
+            grouped_options_for_select(
+              {
+                "Entradas" => @categorias_entrada.map { |c| [ c.nome, c.id, { "data-tipo" => "entrada" } ] },
+                "Saídas" => @categorias_saida.map { |c| [ c.nome, c.id, { "data-tipo" => "saida" } ] }
+              },
+              @movimentacao.categoria_financeira_id
+            ),
+            { prompt: "Selecione a categoria" },
+            class: "form-input", data: { movimentacao_target: "categoria" } %>
+    </div>
+
+    <div>
+      <%= f.label :descricao, "Descrição", class: "form-label" %>
+      <%= f.text_field :descricao, required: true, maxlength: 255, placeholder: "Ex.: Venda do balcão", class: "form-input" %>
+    </div>
+
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div>
+        <%= f.label :valor, "Valor (R$)", class: "form-label" %>
+        <%= f.number_field :valor, step: "0.01", min: 0.01, required: true, inputmode: "decimal", class: "form-input" %>
+      </div>
+      <div>
+        <%= f.label :forma_pagamento, "Pagamento", class: "form-label" %>
+        <%= f.select :forma_pagamento, options_for_select(MovimentacaoFinanceira::ROTULOS_FORMA_PAGAMENTO.map { |valor, rotulo| [ rotulo, valor ] }, @movimentacao.forma_pagamento || "dinheiro"), {}, class: "form-input" %>
+        <p class="mt-2 text-xs text-stone-500">Obrigatório nas entradas.</p>
+      </div>
+    </div>
+
+    <div>
+      <%= f.label :ocorrido_em, "Data e hora", class: "form-label" %>
+      <%= f.datetime_local_field :ocorrido_em, value: @movimentacao.ocorrido_em&.in_time_zone&.strftime("%Y-%m-%dT%H:%M"), class: "form-input" %>
+    </div>
+
+    <div class="rounded-xl bg-stone-50 p-4 text-sm text-stone-600">
+      <p><strong class="text-stone-900">Responsável:</strong> <%= current_user.email %></p>
+      <p class="mt-1"><strong class="text-stone-900">Caixa:</strong> aberto em <%= l(@caixa_atual.aberto_em) %></p>
+    </div>
+
+    <div class="flex flex-wrap gap-3">
+      <%= f.submit "REGISTRAR", class: "primary-button", data: { turbo_confirm: "Confirma o lançamento? Não será possível editar depois." } %>
+      <%= link_to "Cancelar", movimentacao_financeiras_path, class: "inline-flex min-h-12 items-center rounded-xl border border-stone-300 px-5 py-3 text-sm font-semibold text-stone-700 hover:bg-stone-50" %>
+    </div>
+  <% end %>
+</section>

@@ -1,0 +1,10 @@
+fechada_mesa2:
+  mesa: mesa_2
+  abertura_user: admin
+  pagamento_user: admin
+  caixa: fechado
+  status: fechada
+  aberta_em: 2026-10-01 12:00:00
+  fechada_em: 2026-10-01 13:00:00
+  valor_total: 20.00
+  forma_pagamento: pix

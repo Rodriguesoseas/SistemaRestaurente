@@ -1,0 +1,22 @@
+<% content_for :title, "Entrar" %>
+<div class="mb-8 text-center">
+  <span class="mx-auto mb-4 flex size-14 items-center justify-center rounded-2xl bg-forest text-amber-300" aria-hidden="true"><%= icon("flame") %></span>
+  <p class="text-2xl font-bold tracking-tight text-forest">Espetaria</p>
+  <p class="mt-2 text-sm text-stone-500">Sua operação, organizada.</p>
+</div>
+<section class="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8" aria-labelledby="login-title">
+  <h1 id="login-title" class="text-2xl font-semibold tracking-tight">Bem-vindo de volta</h1>
+  <p class="mb-7 mt-2 text-sm text-stone-500">Entre para acessar a gestão da espetaria.</p>
+  <%= form_for(resource, as: resource_name, url: session_path(resource_name), html: { class: "space-y-5" }) do |f| %>
+    <div>
+      <%= f.label :email, "E-mail", class: "form-label" %>
+      <%= f.email_field :email, autofocus: true, autocomplete: "username", required: true, placeholder: "seu@email.com", class: "form-input" %>
+    </div>
+    <div>
+      <%= f.label :password, "Senha", class: "form-label" %>
+      <%= f.password_field :password, autocomplete: "current-password", required: true, maxlength: 128, class: "form-input" %>
+    </div>
+    <%= f.submit "ENTRAR", class: "primary-button w-full", data: { turbo_submits_with: "ENTRANDO…" } %>
+  <% end %>
+</section>
+<p class="mt-6 text-center text-xs leading-5 text-stone-500">Acesso exclusivo à equipe do estabelecimento.<br>Precisa de acesso? Fale com o administrador.</p>

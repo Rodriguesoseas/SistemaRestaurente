@@ -1,0 +1,19 @@
+@import "tailwindcss";
+
+@theme {
+  --color-forest: #172b25;
+  --font-sans: "Segoe UI", ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer base {
+  button, input[type="submit"] { cursor: pointer; }
+  :focus-visible { outline: 3px solid #b45309; outline-offset: 4px; }
+}
+
+@layer components {
+  .form-label { @apply mb-2 block text-sm font-medium text-stone-700; }
+  .form-input { @apply block min-h-12 w-full rounded-xl border border-stone-300 bg-white px-4 py-3 text-base text-stone-900 placeholder:text-stone-400; }
+  .primary-button { @apply min-h-12 rounded-xl bg-forest px-5 py-3 text-sm font-bold tracking-wide text-white transition-colors hover:bg-emerald-900 disabled:cursor-wait disabled:opacity-60; }
+  .skip-link { @apply sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:rounded-lg focus:bg-white focus:px-4 focus:py-3 focus:text-forest; }
+  .table-link { @apply inline-block rounded py-1.5 font-semibold text-emerald-800 hover:underline; }
+}

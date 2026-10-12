@@ -1,0 +1,15 @@
+venda:
+  nome: Venda
+  tipo: entrada
+
+outros_entrada:
+  nome: Outros
+  tipo: entrada
+
+carnes:
+  nome: Carnes
+  tipo: saida
+
+carvao:
+  nome: Carvão
+  tipo: saida

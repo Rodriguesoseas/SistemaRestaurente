@@ -1,0 +1,46 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports:
+          - 5432:5432
+        options: --health-cmd="pg_isready -U postgres" --health-interval=10s --health-timeout=5s --health-retries=5
+    env:
+      RAILS_ENV: test
+      TEST_DATABASE_URL: postgresql://postgres@127.0.0.1:5432/espetaria_test
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+      - name: Ruby style
+        run: bundle exec rubocop
+      - name: Security checks
+        run: |
+          bundle exec brakeman --no-pager
+          bundle exec bundler-audit check --update
+          bundle exec ruby bin/importmap audit
+      - name: Database and autoloading
+        run: |
+          bundle exec rails db:prepare
+          bundle exec rails zeitwerk:check
+      - name: Tests
+        run: |
+          bundle exec rails test
+          bundle exec rails test:system
+      - name: Browser screenshots
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: screenshots
+          path: tmp/screenshots
+          if-no-files-found: ignore

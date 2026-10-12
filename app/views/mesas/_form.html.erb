@@ -1,0 +1,28 @@
+<%= form_with model: mesa, class: "space-y-5" do |f| %>
+  <% if mesa.errors.any? %>
+    <div role="alert" class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900">
+      <ul class="list-inside list-disc">
+        <% mesa.errors.full_messages.each do |message| %><li><%= message %></li><% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= f.label :numero, "Número", class: "form-label" %>
+    <%= f.number_field :numero, step: 1, min: 1, required: true, class: "form-input" %>
+  </div>
+
+  <div>
+    <%= f.label :nome, "Nome (opcional)", class: "form-label" %>
+    <%= f.text_field :nome, maxlength: 255, placeholder: "Ex.: Varanda", class: "form-input" %>
+  </div>
+
+  <label class="flex min-h-11 items-center gap-3 text-sm text-stone-700">
+    <%= f.check_box :ativo, class: "size-5 rounded border-stone-300" %> Mesa ativa
+  </label>
+
+  <div class="flex flex-wrap gap-3">
+    <%= f.submit mesa.persisted? ? "SALVAR" : "CADASTRAR", class: "primary-button" %>
+    <%= link_to "Cancelar", mesas_path, class: "inline-flex min-h-12 items-center rounded-xl border border-stone-300 px-5 py-3 text-sm font-semibold text-stone-700 hover:bg-stone-50" %>
+  </div>
+<% end %>

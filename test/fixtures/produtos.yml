@@ -1,0 +1,29 @@
+espeto:
+  nome: Espeto de carne
+  categoria_produto: carnes
+  quantidade_atual: 0
+  unidade: unidade
+  estoque_minimo: 5
+  ativo: true
+  preco_custo: 4.00
+  preco_venda: 10.00
+  disponivel_venda: true
+
+cerveja:
+  nome: Cerveja
+  categoria_produto: bebidas
+  quantidade_atual: 12
+  unidade: garrafa
+  estoque_minimo: 6
+  ativo: true
+  preco_venda: 8.00
+  disponivel_venda: true
+
+carvao_interno:
+  nome: Carvão
+  categoria_produto: carvao
+  quantidade_atual: 3
+  unidade: pacote
+  estoque_minimo: 1
+  ativo: true
+  disponivel_venda: false

@@ -1,0 +1,66 @@
+<% content_for :title, "Nova movimentação de estoque" %>
+<div class="mb-8">
+  <p class="mb-2 text-xs font-semibold uppercase tracking-widest text-emerald-700">Almoxarifado</p>
+  <h1 class="text-3xl font-bold tracking-tight text-forest">Nova movimentação</h1>
+  <p class="mt-2 text-sm leading-6 text-stone-500">Entrada ou saída manual. O saldo nunca pode ficar negativo.</p>
+</div>
+
+<section class="max-w-xl rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
+  <%= form_with model: @movimentacao, url: movimentacao_estoques_path, class: "space-y-5", data: { controller: "estoque" } do |f| %>
+    <% if @movimentacao.errors.any? %>
+      <div role="alert" class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900">
+        <p class="font-medium">Não foi possível registrar a movimentação:</p>
+        <ul class="mt-1 list-inside list-disc">
+          <% @movimentacao.errors.full_messages.each do |message| %><li><%= message %></li><% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div>
+      <%= f.label :produto_id, "Produto", class: "form-label" %>
+      <%= f.collection_select :produto_id, @produtos, :id, :nome, { prompt: "Selecione o produto" }, class: "form-input" %>
+    </div>
+
+    <div>
+      <%= f.label :tipo, "Tipo", class: "form-label" %>
+      <%= f.select :tipo, options_for_select([ [ "Entrada", "entrada" ], [ "Saída", "saida" ] ], @movimentacao.tipo), {}, class: "form-input", data: { estoque_target: "tipo", action: "estoque#filtrar" } %>
+    </div>
+
+    <div>
+      <%= f.label :motivo, "Motivo", class: "form-label" %>
+      <%= f.select :motivo,
+            options_for_select(
+              MovimentacaoEstoque::MOTIVOS_ENTRADA.map { |m| [ MovimentacaoEstoque::ROTULOS_MOTIVO.fetch(m), m, { "data-tipo" => "entrada" } ] } +
+              MovimentacaoEstoque::MOTIVOS_SAIDA.map { |m| [ MovimentacaoEstoque::ROTULOS_MOTIVO.fetch(m), m, { "data-tipo" => "saida" } ] },
+              @movimentacao.motivo
+            ),
+            { prompt: "Selecione o motivo" },
+            class: "form-input", data: { estoque_target: "motivo" } %>
+    </div>
+
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div>
+        <%= f.label :quantidade, "Quantidade", class: "form-label" %>
+        <%= f.number_field :quantidade, step: "any", min: 0.001, required: true, inputmode: "decimal", placeholder: "Ex.: 1,5", class: "form-input" %>
+      </div>
+      <div>
+        <%= f.label :ocorrido_em, "Data e hora", class: "form-label" %>
+        <%= f.datetime_local_field :ocorrido_em, value: @movimentacao.ocorrido_em&.in_time_zone&.strftime("%Y-%m-%dT%H:%M"), class: "form-input" %>
+      </div>
+    </div>
+
+    <div>
+      <%= f.label :observacao, "Observação (opcional)", class: "form-label" %>
+      <%= f.text_field :observacao, maxlength: 255, placeholder: "Ex.: nota fiscal 123", class: "form-input" %>
+    </div>
+
+    <div class="rounded-xl bg-stone-50 p-4 text-sm text-stone-600">
+      <p><strong class="text-stone-900">Responsável:</strong> <%= current_user.email %></p>
+    </div>
+
+    <div class="flex flex-wrap gap-3">
+      <%= f.submit "REGISTRAR", class: "primary-button", data: { turbo_confirm: "Confirma a movimentação? Não será possível editar depois." } %>
+      <%= link_to "Cancelar", movimentacao_estoques_path, class: "inline-flex min-h-12 items-center rounded-xl border border-stone-300 px-5 py-3 text-sm font-semibold text-stone-700 hover:bg-stone-50" %>
+    </div>
+  <% end %>
+</section>

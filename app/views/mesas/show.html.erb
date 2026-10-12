@@ -1,0 +1,54 @@
+<% content_for :title, "Mesa #{@mesa.numero}" %>
+<div class="mb-8 flex flex-wrap items-start justify-between gap-4">
+  <div>
+    <p class="mb-2 text-xs font-semibold uppercase tracking-widest text-emerald-700">Salão</p>
+    <h1 class="text-3xl font-bold tracking-tight text-forest">Mesa <%= @mesa.numero %><%= " · #{@mesa.nome}" if @mesa.nome.present? %></h1>
+    <p class="mt-2 text-sm leading-6 text-stone-500"><%= @mesa.ocupada? ? "Ocupada" : "Livre" %> · <%= @mesa.ativo? ? "Ativa" : "Inativa" %></p>
+  </div>
+  <%= link_to "EDITAR", edit_mesa_path(@mesa), class: "inline-flex min-h-12 items-center rounded-xl border border-stone-300 px-5 py-3 text-sm font-semibold text-stone-700 hover:bg-stone-50" %>
+</div>
+
+<% if @mesa.ocupada? %>
+  <section class="rounded-2xl border border-amber-300 bg-white p-6 shadow-sm">
+    <p class="text-sm text-stone-600">Comanda aberta às <%= l(@mesa.comanda_aberta.aberta_em, format: :short) %> · <%= number_to_currency(@mesa.comanda_aberta.valor_total) %></p>
+    <div class="mt-4"><%= link_to "VER COMANDA", comanda_path(@mesa.comanda_aberta), class: "inline-flex min-h-12 items-center rounded-xl bg-forest px-5 py-3 text-sm font-bold text-white hover:bg-emerald-900" %></div>
+  </section>
+<% end %>
+
+<section class="mt-8" aria-label="Histórico da mesa">
+  <h2 class="mb-4 text-lg font-semibold text-forest">Histórico de comandas</h2>
+  <% if @comandas.any? %>
+    <div class="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-stone-200 text-sm">
+          <thead class="bg-stone-50 text-left text-xs uppercase tracking-wider text-stone-500">
+            <tr>
+              <th class="px-4 py-3 font-medium">Abertura</th>
+              <th class="px-4 py-3 font-medium">Fechamento</th>
+              <th class="px-4 py-3 text-right font-medium">Total</th>
+              <th class="px-4 py-3 font-medium">Status</th>
+              <th class="px-4 py-3"></th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-stone-100">
+            <% @comandas.each do |comanda| %>
+              <tr>
+                <td class="whitespace-nowrap px-4 py-3"><%= l(comanda.aberta_em) %></td>
+                <td class="whitespace-nowrap px-4 py-3"><%= comanda.fechada_em ? l(comanda.fechada_em) : "—" %></td>
+                <td class="whitespace-nowrap px-4 py-3 text-right"><%= number_to_currency(comanda.valor_total) %></td>
+                <td class="px-4 py-3"><%= comanda.aberta? ? "Aberta" : "Fechada" %></td>
+                <td class="whitespace-nowrap px-4 py-3 text-right"><%= link_to "VER", comanda_path(comanda), class: "table-link" %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  <% else %>
+    <p class="rounded-2xl border border-dashed border-stone-300 bg-white px-6 py-10 text-center text-sm text-stone-500">Nenhuma comanda nesta mesa.</p>
+  <% end %>
+</section>
+
+<div class="mt-8">
+  <%= link_to "Voltar às mesas", mesas_path, class: "inline-flex min-h-12 items-center rounded-xl border border-stone-300 px-5 py-3 text-sm font-semibold text-stone-700 hover:bg-stone-50" %>
+</div>

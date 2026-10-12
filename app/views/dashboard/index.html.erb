@@ -1,0 +1,133 @@
+<% content_for :title, "Dashboard" %>
+<div class="mb-8">
+  <p class="mb-2 text-xs font-semibold uppercase tracking-widest text-emerald-700">Visão geral</p>
+  <h1 class="text-3xl font-bold tracking-tight text-forest">Dashboard</h1>
+  <p class="mt-2 text-sm leading-6 text-stone-500">Acompanhe o dia a dia da sua espetaria.</p>
+</div>
+
+<section class="mb-6 rounded-2xl border border-stone-200 bg-white p-5 shadow-sm sm:p-6" aria-label="Filtro de período">
+  <div class="flex flex-wrap gap-2">
+    <% FiltroPeriodo::PERIODOS.each do |periodo| %>
+      <%= link_to FiltroPeriodo::ROTULOS_PERIODO.fetch(periodo).upcase, dashboard_path(periodo: periodo), class: "inline-flex min-h-11 items-center rounded-xl px-4 py-2 text-xs font-bold #{@filtro.periodo == periodo ? 'bg-forest text-white' : 'border border-stone-300 text-stone-700 hover:bg-stone-50'}", aria: { current: @filtro.periodo == periodo ? "true" : nil } %>
+    <% end %>
+  </div>
+
+  <div class="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-stone-100 pt-4">
+    <p class="text-sm font-semibold text-forest"><%= @filtro.descricao %></p>
+    <div class="flex gap-2">
+      <%= link_to "← ANTERIOR", dashboard_path(@filtro.anterior_parametros), class: "inline-flex min-h-11 items-center rounded-xl border border-stone-300 px-4 py-2 text-xs font-bold text-stone-700 hover:bg-stone-50" %>
+      <% unless @filtro.atual? %>
+        <%= link_to "PRÓXIMO →", dashboard_path(@filtro.proximo_parametros), class: "inline-flex min-h-11 items-center rounded-xl border border-stone-300 px-4 py-2 text-xs font-bold text-stone-700 hover:bg-stone-50" %>
+      <% end %>
+    </div>
+  </div>
+
+  <%= form_with url: dashboard_path, method: :get, class: "mt-4 grid grid-cols-1 gap-4 border-t border-stone-100 pt-4 sm:grid-cols-3" do |f| %>
+    <%= f.hidden_field :periodo, value: FiltroPeriodo::PERSONALIZADO %>
+    <div>
+      <%= f.label :de, "De", class: "form-label" %>
+      <%= f.date_field :de, value: @filtro.de&.iso8601, class: "form-input" %>
+    </div>
+    <div>
+      <%= f.label :ate, "Até", class: "form-label" %>
+      <%= f.date_field :ate, value: @filtro.ate&.iso8601, class: "form-input" %>
+    </div>
+    <div class="flex items-end">
+      <%= f.submit "FILTRAR", class: "primary-button" %>
+    </div>
+  <% end %>
+</section>
+
+<section aria-label="Indicadores" class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+  <article class="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm sm:p-6">
+    <div class="flex items-center justify-between gap-3">
+      <h2 class="text-sm font-medium text-stone-600">Entradas</h2>
+      <span class="rounded-xl bg-stone-100 p-2.5 text-emerald-800"><%= icon("income") %></span>
+    </div>
+    <p class="my-3 text-3xl font-semibold text-emerald-700"><%= number_to_currency(@total_entradas) %></p>
+    <p class="text-xs leading-5 text-stone-500"><%= @filtro.descricao %></p>
+  </article>
+  <article class="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm sm:p-6">
+    <div class="flex items-center justify-between gap-3">
+      <h2 class="text-sm font-medium text-stone-600">Saídas</h2>
+      <span class="rounded-xl bg-stone-100 p-2.5 text-emerald-800"><%= icon("expense") %></span>
+    </div>
+    <p class="my-3 text-3xl font-semibold text-red-700"><%= number_to_currency(@total_saidas) %></p>
+    <p class="text-xs leading-5 text-stone-500"><%= @filtro.descricao %></p>
+  </article>
+  <article class="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm sm:p-6">
+    <div class="flex items-center justify-between gap-3">
+      <h2 class="text-sm font-medium text-stone-600">Resultado</h2>
+      <span class="rounded-xl bg-stone-100 p-2.5 text-emerald-800"><%= icon("result") %></span>
+    </div>
+    <p class="my-3 text-3xl font-semibold text-stone-800"><%= number_to_currency(@resultado) %></p>
+    <p class="text-xs leading-5 text-stone-500"><%= @filtro.descricao %></p>
+  </article>
+  <article class="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm sm:p-6">
+    <div class="flex items-center justify-between gap-3">
+      <h2 class="text-sm font-medium text-stone-600">Caixa</h2>
+      <span class="rounded-xl bg-stone-100 p-2.5 text-emerald-800"><%= icon("cash") %></span>
+    </div>
+    <% if @caixa_atual %>
+      <p class="my-3 text-3xl font-semibold text-stone-800"><%= number_to_currency(@caixa_atual.saldo_consolidado) %></p>
+      <p class="text-xs leading-5 text-stone-500">Aberto em <%= l(@caixa_atual.aberto_em, format: :short) %> · <%= link_to "Ver caixa", caixa_path(@caixa_atual), class: "font-semibold text-emerald-800 hover:underline" %></p>
+    <% else %>
+      <p class="my-3 text-3xl font-semibold text-stone-300" aria-label="Nenhum caixa aberto">—</p>
+      <p class="text-xs leading-5 text-stone-500">Nenhum caixa aberto · <%= link_to "Abrir caixa", new_caixa_path, class: "font-semibold text-emerald-800 hover:underline" %></p>
+    <% end %>
+  </article>
+  <article class="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm sm:p-6">
+    <div class="flex items-center justify-between gap-3">
+      <h2 class="text-sm font-medium text-stone-600">Mesas ocupadas</h2>
+      <span class="rounded-xl bg-stone-100 p-2.5 text-emerald-800"><%= icon("tables") %></span>
+    </div>
+    <p class="my-3 text-3xl font-semibold text-stone-800"><%= @mesas_ocupadas %></p>
+    <p class="text-xs leading-5 text-stone-500">Agora · <%= link_to "Ver mesas", mesas_path, class: "font-semibold text-emerald-800 hover:underline" %></p>
+  </article>
+  <article class="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm sm:p-6">
+    <div class="flex items-center justify-between gap-3">
+      <h2 class="text-sm font-medium text-stone-600">Estoque baixo</h2>
+      <span class="rounded-xl bg-stone-100 p-2.5 text-emerald-800"><%= icon("stock") %></span>
+    </div>
+    <p class="my-3 text-3xl font-semibold <%= @estoque_baixo_count.positive? ? 'text-amber-700' : 'text-stone-800' %>"><%= @estoque_baixo_count %></p>
+    <p class="text-xs leading-5 text-stone-500"><%= link_to "Ver estoque", movimentacao_estoques_path, class: "font-semibold text-emerald-800 hover:underline" %> · produtos ativos com saldo no mínimo ou zerados</p>
+  </article>
+</section>
+
+<section class="mt-7" aria-label="Últimas movimentações">
+  <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+    <h2 class="text-lg font-semibold text-forest">Últimas movimentações</h2>
+    <%= link_to "VER TODAS", movimentacao_financeiras_path, class: "table-link text-xs font-bold" %>
+  </div>
+  <% if @ultimas_movimentacoes.any? %>
+    <div class="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-stone-200 text-sm">
+          <thead class="bg-stone-50 text-left text-xs uppercase tracking-wider text-stone-500">
+            <tr>
+              <th class="px-4 py-3 font-medium">Data</th>
+              <th class="px-4 py-3 font-medium">Descrição</th>
+              <th class="px-4 py-3 text-right font-medium">Valor</th>
+              <th class="px-4 py-3"></th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-stone-100">
+            <% @ultimas_movimentacoes.each do |movimentacao| %>
+              <tr>
+                <td class="whitespace-nowrap px-4 py-3"><%= l(movimentacao.ocorrido_em) %></td>
+                <td class="px-4 py-3">
+                  <span class="font-medium text-stone-800"><%= movimentacao.descricao %></span>
+                  <span class="ml-2 inline-flex rounded-full px-2 py-0.5 text-xs font-semibold <%= movimentacao.entrada? ? 'bg-emerald-50 text-emerald-800' : 'bg-red-50 text-red-800' %>"><%= movimentacao.entrada? ? "Entrada" : "Saída" %></span>
+                </td>
+                <td class="whitespace-nowrap px-4 py-3 text-right font-semibold <%= movimentacao.entrada? ? 'text-emerald-700' : 'text-red-700' %>"><%= number_to_currency(movimentacao.valor) %></td>
+                <td class="whitespace-nowrap px-4 py-3 text-right"><%= link_to "VER", movimentacao_financeira_path(movimentacao), class: "table-link" %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  <% else %>
+    <p class="rounded-2xl border border-dashed border-stone-300 bg-white px-6 py-10 text-center text-sm text-stone-500">Nenhuma movimentação neste período.</p>
+  <% end %>
+</section>

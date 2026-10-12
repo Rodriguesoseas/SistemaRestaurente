@@ -1,0 +1,10 @@
+fechado:
+  user: admin
+  fechamento_user: admin
+  saldo_inicial: 100.00
+  status: fechado
+  aberto_em: 2026-10-01 08:00:00
+  fechado_em: 2026-10-01 18:00:00
+  valor_esperado_dinheiro: 100.00
+  valor_contado: 95.00
+  diferenca: -5.00

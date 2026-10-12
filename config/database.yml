@@ -1,0 +1,23 @@
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  max_connections: <%= ENV.fetch("RAILS_MAX_THREADS", 5) %>
+  host: <%= ENV.fetch("PGHOST", "127.0.0.1").to_json %>
+  port: <%= ENV.fetch("PGPORT", 5432) %>
+  username: <%= ENV.fetch("PGUSER", "espetaria").to_json %>
+  password: <%= ENV.fetch("PGPASSWORD", "").to_json %>
+
+development:
+  <<: *default
+  database: espetaria_development
+
+# An explicit URL prevents DATABASE_URL from redirecting tests to the real database.
+test:
+  <<: *default
+  url: <%= ENV.fetch("TEST_DATABASE_URL", "postgresql://#{ERB::Util.url_encode(ENV.fetch('PGUSER', 'espetaria'))}:#{ERB::Util.url_encode(ENV.fetch('PGPASSWORD', ''))}@#{ENV.fetch('PGHOST', '127.0.0.1')}:#{ENV.fetch('PGPORT', '5432')}/espetaria_test").to_json %>
+
+production:
+  adapter: postgresql
+  encoding: unicode
+  max_connections: <%= ENV.fetch("RAILS_MAX_THREADS", 5) %>
+  url: <%= ENV["DATABASE_URL"].to_json %>
