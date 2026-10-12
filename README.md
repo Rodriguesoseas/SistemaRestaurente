@@ -50,6 +50,19 @@ A aplicação reúne os principais módulos de gestão propostos, com funcionali
 
 **Oseas Rodrigues**
 
+imagens. 
+
+<img width="1207" height="694" alt="8" src="https://github.com/user-attachments/assets/2324cba7-761d-4ad0-aa31-42c861008cee" />
+<img width="1851" height="935" alt="7" src="https://github.com/user-attachments/assets/34887072-aa34-474c-a911-f2ab0d15c0b5" />
+<img width="1847" height="900" alt="6" src="https://github.com/user-attachments/assets/48830941-8a15-4717-9aa1-63bc52024068" />
+<img width="1850" height="914" alt="5" src="https://github.com/user-attachments/assets/632c65ad-9834-44a6-b0ea-b189a4f98862" />
+<img width="1839" height="895" alt="4" src="https://github.com/user-attachments/assets/6513aeec-f74c-4729-a1a6-0ed4757c2bfc" />
+<img width="1847" height="936" alt="3" src="https://github.com/user-attachments/assets/71f9e48e-09a4-45e4-8cdf-70f09f18d222" />
+<img width="1856" height="934" alt="2" src="https://github.com/user-attachments/assets/59771221-0264-491e-beb1-24d6813780cb" />
+<img width="1849" height="931" alt="1" src="https://github.com/user-attachments/assets/a2e007f8-b113-4b6a-b381-2b0b41615ffd" />
+
+
+
 Desenvolvedor de software e estudante de Análise e Desenvolvimento de Sistemas, com interesse em desenvolvimento web, automação e criação de soluções digitais para problemas reais.
 
 - 💻 [GitHub](https://github.com/Rodriguesoseas)
