@@ -19,7 +19,7 @@ gem "tailwindcss-rails"
 gem "devise", "~> 5.0"
 gem "rails-i18n", "~> 8.0"
 gem "chartkick", "~> 5.0"
-gem "csv", "~> 3.0"
+gem "csv", "~> 3.3"
 
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
 # gem "bcrypt", "~> 3.1.7"
